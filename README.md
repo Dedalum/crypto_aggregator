@@ -30,7 +30,15 @@ model/      # data model
 outputs/    # output modules (MQTT, etc.)
 ```
 
+### Input modules
+Input modules are used for gathering data (from crypto coins stockexchanges,
+where a wallet is to be expected, etc.): 
+- Binance module: uses the wrapper <https://github.com/binance/binance-connector-python>
+
 ## TODO
-- input module Binance: gather further data
+- input modules:
+    - Binance: gather further data
+    - handle further stock exchanges (and wallets)
 - make a output module for a full chain POC (MQTT ?)
 - which data model to follow: 1 crypto asset = 1 account or 1 investment ?
+- dockerize and kubernitize (ofc)
