@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "crypto_aggregator"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+binance-connector = "^1.9.0"
+python-dotenv = "^0.19.2"
+pytest = "^6.2.5"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
