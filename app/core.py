@@ -37,7 +37,9 @@ def run():
 
     # run the input module
     client = get_client(config)
-    data = client.get_data()
+    result = client.get_result()
+
+    print(result)
     # parse the data
 
     # verify the data

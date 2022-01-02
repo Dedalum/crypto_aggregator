@@ -9,7 +9,7 @@ class Account:
         self.label = None
         self.amount = 0
         self.investments = []
+        self.trading_orders = []
 
     def __str__(self):
         return "{} - {}".format(self.id, self.label)
-
