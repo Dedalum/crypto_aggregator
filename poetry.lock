@@ -219,6 +219,23 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "pulsar-client"
+version = "2.9.1"
+description = "Apache Pulsar Python client library"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+certifi = "*"
+six = "*"
+
+[package.extras]
+all = ["apache-bookkeeper-client (>=4.9.2)", "fastavro (==0.24.0)", "grpcio (>=1.8.2,<1.28)", "prometheus-client", "protobuf (>=3.6.1)", "ratelimit"]
+avro = ["fastavro (==0.24.0)"]
+functions = ["apache-bookkeeper-client (>=4.9.2)", "grpcio (>=1.8.2,<1.28)", "prometheus-client", "protobuf (>=3.6.1)", "ratelimit"]
+
+[[package]]
 name = "py"
 version = "1.11.0"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
@@ -469,7 +486,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "21738c3f48588628ca80f9235376d6a1a86dceb2ba622fc344c74c2f2df4502d"
+content-hash = "56cb3f25f708c8d295e65f7e2d62fa2022d94e2c501383cc79050fc5feb75758"
 
 [metadata.files]
 atomicwrites = [
@@ -609,6 +626,15 @@ packaging = [
 pluggy = [
     {file = "pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},
     {file = "pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159"},
+]
+pulsar-client = [
+    {file = "pulsar_client-2.9.1-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:814ba4d9b7a20c978a65a0be0c9088cc9a7f7ca48837e26fa4f61e8ae17eb5d1"},
+    {file = "pulsar_client-2.9.1-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:183b516e155f38a7f3670b8222ae9e2d5d5d9a0179472097b0608dd6856ca714"},
+    {file = "pulsar_client-2.9.1-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:5f63f940770a869a09f7e531f6255cf2e61861b3e09bd158fea32f23d5c4afdb"},
+    {file = "pulsar_client-2.9.1-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:31d5cdee769d6abcd1e51d86a0f8429bdb69ddf67cac20b2f1a185e75509325e"},
+    {file = "pulsar_client-2.9.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:ae4719b071d6f89b8dabea6e45b0674f835d15d23257b6511a733ff958cdf348"},
+    {file = "pulsar_client-2.9.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:75fa10d56bad5502af75da64bdf65ae3226ff8c303df8b9cd3de46b9c3ba8a67"},
+    {file = "pulsar_client-2.9.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bf2e5e7226baca0c905ff4282ad35284a08d84ce596d051aeb7d7e0fdd38d7a7"},
 ]
 py = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
