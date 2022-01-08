@@ -18,7 +18,7 @@ class Client(Enum):
 
 
 @dataclass
-class Configuration:
+class Config:
     """
     Configuration class corresponding to the config file given by the user
     """

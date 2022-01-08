@@ -22,6 +22,7 @@ class Client(BaseClient):
     def __init__(self, api_key: str, api_secret: str):
         super().__init__(api_key, api_secret)
         self.spot = Spot(key=self.api_key, secret=self.api_secret)
+        self.parser = Parser()
 
     def _get_account_snapshot(self) -> dict:
         data = {}
