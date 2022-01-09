@@ -5,7 +5,7 @@ Config for inputs using dataclasses
 from dataclasses import dataclass
 from enum import Enum
 
-import inputs.binance
+import outputs.pulsar_client
 
 
 class Client(Enum):
@@ -14,7 +14,7 @@ class Client(Enum):
     corresponding input module client to use.
     """
 
-    BINANCE = inputs.binance.Client
+    PULSAR = outputs.pulsar_client.Client
 
 
 @dataclass
@@ -24,5 +24,5 @@ class Config:
     """
 
     client: Client
-    api_key: str
-    api_secret: str
+    host: str
+    client_id: str

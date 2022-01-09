@@ -2,6 +2,12 @@
 Base class Client
 """
 
+from typing import List
+
+from model.account import Account
+from model.investment import Investment
+from model.trading_order import TradingOrder
+
 
 class BaseClient:
     """
@@ -25,11 +31,11 @@ class BaseParser:
     BaseParser
     """
 
-    def build_accounts(self, data: dict) -> List[Account]
+    def build_accounts(self, data: dict) -> List[Account]:
         pass
 
-    def build_investments(self, data: dict) -> List[Investments]:
+    def build_investments(self, data: dict) -> List[Investment]:
         pass
 
-    def build_trading_orders(self, data: dict) -> List[TradingOrders]:
+    def build_trading_orders(self, data: dict) -> List[TradingOrder]:
         pass
