@@ -10,6 +10,7 @@ binance-connector = "^1.9.0"
 python-dotenv = "^0.19.2"
 pytest = "^6.2.5"
 pulsar-client = "^2.9.1"
+pydantic = "^1.10.4"
 
 [tool.poetry.dev-dependencies]
 

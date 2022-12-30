@@ -3,7 +3,7 @@ Account tests
 """
 
 import pytest
-from inputs.binance import Parser
+from connectors.binance import Parser
 from model.account import Account
 
 
