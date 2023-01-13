@@ -5,12 +5,12 @@ Core
 import asyncio
 import app.config
 import connectors.config
-import rx.config
+import netio.config
 from dotenv import dotenv_values
 from connectors.base_client import BaseClient
 from model.result import Result
 from model.job import Job
-from rx.base_output import BaseOutput
+from netio.base_output import BaseOutput
 
 
 def get_config(config_file=".env") -> app.config.Config:
@@ -24,8 +24,8 @@ def get_config(config_file=".env") -> app.config.Config:
             api_key=config_dict.get("API_KEY"),
             api_secret=config_dict.get("API_SECRET"),
         ),
-        rx.config.Config(
-            client=rx.config.Client[config_dict.get("OUTPUT")],
+        netio.config.Config(
+            client=netio.config.Client[config_dict.get("OUTPUT")],
             host=config_dict.get("HOST"),
             client_id=config_dict.get("CLIENT_ID"),
         ),
@@ -40,7 +40,7 @@ def get_client(config: connectors.config.Config) -> BaseClient:
     return config.client.value(config.api_key, config.api_secret)
 
 
-def get_output_client(config: rx.config.Config) -> BaseOutput:
+def get_output_client(config: netio.config.Config) -> BaseOutput:
     return config.client.value(config.host, config.client_id)
 
 
@@ -49,39 +49,45 @@ def run():
     Run the main process
     """
     
-    # parse the config file
+    # parse the configuration for the application
     config = get_config()
     
-    queue = asyncio.Queue(maxsize=100)  # 100 results stocked max
+    # create queue for passing the results from the konnektors
+    results_queue = asyncio.Queue(maxsize=100)  # 100 results stocked max
 
-    # parse the data
-    output_client = get_output_client(config.rx)
-    output_client.setup()
+    # create the Pulsar client
+    netio_client = get_output_client(config.netio)
+    netio_client.setup()
 
-    handle_queue(output_client, queue)
+    # handle the results received on the result_queue in a new thread
+    # resulsts: data coming from the various konnectors and to be sent to Pulsar
+    handle_results_queue(netio_client, results_queue)
+
+    # handle the jobs list
+    handle_jobs(netio_client)
 
 
-
-async def run_job(job: Job, queue: asyncio.Queue):
+async def run_job(job: Job, results_queue: asyncio.Queue):
 
     # run the input module
-    client = get_client(job.config.inputs)
-    # result = client.get_result()
-    result = Result()
-    result.accounts = ["First account", "2nd account"]
+    konnector = get_client(job.config.inputs)
+    # result = konnector.get_result()
+    # result = Result()
+    # result.accounts = ["First account", "2nd account"]
 
-    await queue.put(result)
+    await results_queue.put(result)
 
 
 async def handle_jobs(output_client: BaseOutput):
     while True:
+        # receive job from Pulsar: sub /job
         job = await output_client.get_job()
         
         # TODO: add job to list of asyncio tasks 
         # run_job(job)
 
 
-async def handle_queue(output_client: BaseOutput, queue: asyncio.Queue):
+async def handle_results_queue(output_client: BaseOutput, queue: asyncio.Queue):
     while True:
         try:
             result = await queue.get()
