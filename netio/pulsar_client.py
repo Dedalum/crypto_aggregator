@@ -6,7 +6,7 @@ Pulsar client output classes
 import pulsar
 
 from model.result import Result
-from rx.base_output import BaseFormatter, BaseOutput, BaseVerifier
+from netio.base_output import BaseFormatter, BaseOutput, BaseVerifier
 
 
 class Client(BaseOutput):
