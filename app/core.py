@@ -37,7 +37,7 @@ def run():
     # parse the configuration for the application
     config = get_config()
 
-    # create the Pulsar client
+    # create the Pulsar or MQTT client
     netio_client = get_output_client(config.netio)
     netio_client.setup()
 
@@ -46,12 +46,12 @@ def run():
 
     # handle the results received on the result_queue in a new thread
     # results: data coming from the various konnectors and to be sent to Pulsar
-    netio_client.handle_result(results_queue)
+    netio_client.result_processor(results_queue)
 
     # handle the jobs list
     jobs_queue = asyncio.Queue(maxsize=100)  # 100 results stocked max
     netio_client.get_job(jobs_queue)
-    handle_jobs(results_queue, jobs_queue)
+    job_processor(results_queue, jobs_queue)
 
 
 async def run_job(job: Job, results_queue: asyncio.Queue):
@@ -64,7 +64,7 @@ async def run_job(job: Job, results_queue: asyncio.Queue):
     await results_queue.put(result)
 
 
-async def handle_jobs(results_queue: asyncio.Queue, jobs_queue: asyncio.Queue):
+async def job_processor(results_queue: asyncio.Queue, jobs_queue: asyncio.Queue):
     while True:
         job = jobs_queue.get()
         # TODO: add job to list of asyncio tasks 

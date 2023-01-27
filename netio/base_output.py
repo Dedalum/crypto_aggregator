@@ -31,7 +31,7 @@ class BaseOutput:
         serialized = self.formatter.run(data)
         return serialized
 
-    async def handle_result(self, queue: asyncio.Queue):
+    async def result_processor(self, queue: asyncio.Queue):
         while True:
             try:
                 result = await queue.get()
