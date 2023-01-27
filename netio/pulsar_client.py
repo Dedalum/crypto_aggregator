@@ -3,10 +3,15 @@ Pulsar client output classes
 """
 
 
+import asyncio
+from connectors import binance
+from model.job import BadJob, Job
 import pulsar
 
 from model.result import Result
 from netio.base_output import BaseFormatter, BaseOutput, BaseVerifier
+
+TOPIC_BASE_JOB = "job"
 
 
 class Client(BaseOutput):
@@ -15,23 +20,41 @@ class Client(BaseOutput):
         self.formatter = Formatter()
         self.client = None
         self.producer = None
+        self.consumer = None
 
     def setup(self):
         self._set_client()
-        topic_producer = "output-{}".format(self.client_id)
+        topic_producer = f"{TOPIC_BASE_JOB}/{self.client_id}/result"
         self._set_producer(topic_producer)
 
-    def serialize_result(self, data: Result) -> str:
-        # format
-        serialized = self.formatter.run(data)
-        return serialized
+        self.consumer = self.client.subscribe(
+            f"{TOPIC_BASE_JOB}", 
+            "get-job",  #TODO ?
+            properties={
+                "consumer-name": f"client-{self.client_id}",
+                "consumer-id": f"client-{self.client_id}",
+            },
+        )
 
-    def send_result(self, serialized: str):
-        print("Sending result to Pulsar: {}".format(serialized))
-        self._send(serialized)
+    async def get_job(self, queue: asyncio.Queue):
+        while True:
+            msg = self.consumer.receive()
+            try:
+                print("Received message '{}' id='{}'".format(msg.data(), msg.message_id()))
+
+                # Acknowledge successful processing of the message
+                self.consumer.acknowledge(msg)
+
+                queue.put(self._build_job(msg.data().decode('utf-8')))
+            
+            except BadJob:
+                print(f"received job unsupported or wrong: {msg.data}")
+
+            except Exception:
+                self.consumer.negative_acknowledge(msg)
 
     def _set_client(self):
-        self.client = pulsar.Client("pulsar://{}".format(self.host))
+        self.client = pulsar.Client(f"pulsar://{self.host}")
 
     def _set_producer(self, topic: str):
         self.producer = self.client.create_producer(topic)
@@ -51,3 +74,5 @@ class Formatter(BaseFormatter):
 class Verifier(BaseVerifier):
     def __init__(self):
         super().__init__()
+
+

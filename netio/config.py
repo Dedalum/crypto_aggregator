@@ -5,7 +5,7 @@ Config for inputs using dataclasses
 from dataclasses import dataclass
 from enum import Enum
 
-import outputs.pulsar_client
+import netio.pulsar_client
 
 
 class Client(Enum):
@@ -14,7 +14,7 @@ class Client(Enum):
     corresponding input module client to use.
     """
 
-    PULSAR = outputs.pulsar_client.Client
+    PULSAR = netio.pulsar_client.Client
 
 
 @dataclass

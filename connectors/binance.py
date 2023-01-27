@@ -10,10 +10,10 @@ from model.investment import Investment
 from model.result import Result
 from model.trading_order import TradingOrder
 
-from .base_client import BaseClient, BaseParser
+from .base_connector import BaseConnector, BaseParser
 
 
-class Client(BaseClient):
+class Client(BaseConnector):
     """
     Client class for Binance that connects to the Binance API and returns the
     required data.

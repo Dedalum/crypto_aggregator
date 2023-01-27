@@ -2,10 +2,15 @@
 Job model
 """
 
+from connectors.base_connector import BaseConnector
 from pydantic import BaseModel
 import app
 
 
 class Job(BaseModel):
     id: int
-    config: app.config.Config
+    connector: BaseConnector
+
+
+class BadJob(Exception):
+    pass

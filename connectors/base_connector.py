@@ -7,11 +7,12 @@ from typing import List
 from model.account import Account
 from model.investment import Investment
 from model.trading_order import TradingOrder
+from pydantic import BaseModel
 
 
-class BaseClient:
+class BaseConnector(BaseModel):
     """
-    BaseClient to serve as the base model for every input module Clients
+    BaseConnector to serve as the base model for every input module Clients
     """
 
     def __init__(self, api_key: str, api_secret: str):
