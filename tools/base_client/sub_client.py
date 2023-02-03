@@ -18,23 +18,9 @@ class Client:
 
     def on_message(self, client, userdata, msg):
         print(msg.topic + " " + str(msg.payload))
-
-        if msg.topic == "{}/{}/job".format(self.base_topic, self.client_id):
-            try:
-                payload_json = json.loads(msg.payload)  # .decode("utf-8"))
-            except Exception as err:
-                print(err)
-                return
-
-            gid = payload_json.get("gid")
-            task = payload_json.get("task")
-            job = Job(gid, task)
-            print("Got a job: {}".format(job))
-
-            # TODO: execute job
-
+        
     def subscribe(self, topic):
-        self.mqtt_client.subscribe("{}/{}/#".format(topic, self.client_id))
+        self.mqtt_client.subscribe(f"{topic}/#")
 
 
 def main():
