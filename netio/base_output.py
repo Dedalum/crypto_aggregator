@@ -3,6 +3,7 @@
 
 import asyncio
 import re
+import json
 from model.job import BadJob, Job
 
 from connectors import binance
@@ -59,19 +60,28 @@ class BaseOutput:
     async def get_job(self):
         pass
 
-    def _build_job(job_data: dict) -> Job:
-        if job_data["connector"] == "binance":
-            connector_class = binance.client
-        else:
-            print(f'unsupported connector {job_data["connector"]}')
-            raise BadJob
+    def _build_job(self, job_str: str) -> Job:
+        # TODO: turned job_data to dict
+        job_data = json.loads(job_str)
 
-        connector = connector_class(
-            job_data["api_key"],
-            job_data["api_secret"],
-        )
-  
-        return Job(job_data["id"], connector)
+        try:
+            if job_data["connector"] == "binance":
+                connector_class = binance.Client
+            else:
+                print(f'unsupported connector {job_data["connector"]}')
+                raise BadJob
+
+            connector = connector_class(
+                job_data["api_key"],
+                job_data["api_secret"],
+            )
+            
+    
+            return Job(job_data["id"], connector)
+        except TypeError as e:
+            print(f"err: {e}")
+
+        return 
         
     def _send(self, data: str):
         pass

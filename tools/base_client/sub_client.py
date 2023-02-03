@@ -18,7 +18,7 @@ class Client:
 
     def on_message(self, client, userdata, msg):
         print(msg.topic + " " + str(msg.payload))
-        
+
     def subscribe(self, topic):
         self.mqtt_client.subscribe(f"{topic}/#")
 

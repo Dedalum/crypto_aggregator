@@ -12,7 +12,7 @@ import paho.mqtt.client as mqtt
 from model.result import Result
 from netio.base_output import BaseFormatter, BaseOutput, BaseVerifier
 
-TOPIC_BASE_JOB = "job"
+TOPIC_BASE_JOB = "/job"
 
 
 class Client(BaseOutput):
@@ -24,8 +24,8 @@ class Client(BaseOutput):
         self.consumer = None
 
     def setup(self):
-        self._set_client()
-        self.client = mqtt.Client()
+        self.client = mqtt.Client(client_id=self.client_id)
+        self.client.connect(self.host.split(":")[0], int(self.host.split(":")[1]), 60)
         self.client.on_connect = self._on_connect
         self.client.on_message = self._on_message
 
@@ -48,9 +48,6 @@ class Client(BaseOutput):
             except Exception:
                 self.consumer.negative_acknowledge(msg)
 
-    def _set_client(self):
-        pass
-
     def _send(self, data: str):
         self.client.publish(data.encode("utf-8"))
 
@@ -68,7 +65,7 @@ class Client(BaseOutput):
         print(msg.topic+" "+str(msg.payload))
 
         # if messge received on TOPIC_BASE_JOB: job
-        if msg.topic.start.startswith(TOPIC_BASE_JOB):
+        if msg.topic.startswith(TOPIC_BASE_JOB):  # TODO: check hierarchy topics
             job = self._build_job(msg.payload)
             self._job_queue.put(job)
 
