@@ -33,6 +33,7 @@ class BaseOutput:
         return serialized
 
     async def result_processor(self, queue: asyncio.Queue):
+        print("Starting result processor")
         while True:
             try:
                 result = await queue.get()
@@ -57,6 +58,9 @@ class BaseOutput:
     def setup(self):
         pass
 
+    async def run(self):
+        pass
+
     async def get_job(self):
         pass
 
@@ -77,11 +81,10 @@ class BaseOutput:
             )
             
     
-            return Job(job_data["id"], connector)
-        except TypeError as e:
+            return Job(id=job_data["id"], connector=connector)
+        except (KeyError, TypeError) as e:
             print(f"err: {e}")
-
-        return 
+            raise BadJob
         
     def _send(self, data: str):
         pass
@@ -91,10 +94,7 @@ class BaseOutput:
         try:
             return re.search(r"(\w+):(\d+)", host).group(0)
         except (TypeError, AttributeError, IndexError) as exc:
-            raise ConfigurationError(exc)
-
-        return None
-        
+            raise ConfigurationError(exc)        
 
 
 class BaseFormatter:

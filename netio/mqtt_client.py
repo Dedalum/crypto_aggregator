@@ -20,33 +20,31 @@ class Client(BaseOutput):
         super().__init__(host, client_id)
         self.formatter = Formatter()
         self.client = None
-        self.producer = None
-        self.consumer = None
 
     def setup(self):
         self.client = mqtt.Client(client_id=self.client_id)
         self.client.connect(self.host.split(":")[0], int(self.host.split(":")[1]), 60)
         self.client.on_connect = self._on_connect
+        self._job_queue = asyncio.Queue()
         self.client.on_message = self._on_message
 
-        self._job_queue = asyncio.Queue()
-
-        self.client.loop_forever()  #TODO code bloquant ?
-
+    async def run(self):
+        print("Running MQTT client")
+        self.client.loop_start()
 
     async def get_job(self, queue: asyncio.Queue):
+        print("MQTT client getting jobs")
         while True:
             try:
-                job = self._job_queue.get()
+                print(f"len job queue 2--: {self._job_queue.qsize()}")
+                job = await self._job_queue.get()
+                print(f"received job: {job}")
 
                 # push to the core's jobs queue
-                queue.put(self._build_job(job))
+                await queue.put(self._build_job(job))
             
             except BadJob:
                 print(f"received job unsupported or wrong: {msg.data}")
-
-            except Exception:
-                self.consumer.negative_acknowledge(msg)
 
     def _send(self, data: str):
         self.client.publish(data.encode("utf-8"))
@@ -60,14 +58,18 @@ class Client(BaseOutput):
         # /job -> on ne recoit que sur /job
         client.subscribe(f"{TOPIC_BASE_JOB}/#")
 
-
     def _on_message(self, client, userdata, msg):
         print(msg.topic+" "+str(msg.payload))
 
         # if messge received on TOPIC_BASE_JOB: job
         if msg.topic.startswith(TOPIC_BASE_JOB):  # TODO: check hierarchy topics
             job = self._build_job(msg.payload)
-            self._job_queue.put(job)
+            try:
+                print(f"pushing job: {job}")
+                self._job_queue.put_nowait(job)
+                print(f"len job queue: {self._job_queue.qsize()}")
+            except BadJob as e:
+                print(f"err: bad job {e}")
 
 
     def close_connection(self):

@@ -33,25 +33,45 @@ def run():
     """
     Run the main process
     """
+    asyncio.run(assemble_core())
+    print("done")
     
+async def assemble_core():
     # parse the configuration for the application
     config = get_config()
 
     # create the Pulsar or MQTT client
     netio_client = get_output_client(config.netio)
     netio_client.setup()
+    
+    # netio_client_run_task = asyncio.create_task(netio_client.run())
 
     # create queue for passing the results from the konnektors
     results_queue = asyncio.Queue(maxsize=100)  # 100 results stocked max
 
     # handle the results received on the result_queue in a new thread
     # results: data coming from the various konnectors and to be sent to Pulsar
-    netio_client.result_processor(results_queue)
+    # netio_client_result_processor_task = asyncio.create_task(netio_client.result_processor(results_queue))
 
     # handle the jobs list
     jobs_queue = asyncio.Queue(maxsize=100)  # 100 results stocked max
-    netio_client.get_job(jobs_queue)
-    job_processor(results_queue, jobs_queue)
+    # netio_client_get_job_task = asyncio.create_task(netio_client.get_job(jobs_queue))
+    # job_processor_task = asyncio.create_task(job_processor(results_queue, jobs_queue))
+
+    await asyncio.gather(
+        netio_client.result_processor(results_queue),
+        netio_client.get_job(jobs_queue),
+        job_processor(results_queue, jobs_queue),
+        netio_client.run(),
+    )
+
+
+    # await asyncio.gather(
+    #     netio_client_result_processor_task,
+    #     netio_client_get_job_task,
+    #     job_processor_task,
+    #     netio_client_run_task,
+    # )
 
 
 async def run_job(job: Job, results_queue: asyncio.Queue):
@@ -65,7 +85,8 @@ async def run_job(job: Job, results_queue: asyncio.Queue):
 
 
 async def job_processor(results_queue: asyncio.Queue, jobs_queue: asyncio.Queue):
+    print("Starting job processor")
     while True:
-        job = jobs_queue.get()
+        job = await jobs_queue.get()
         # TODO: add job to list of asyncio tasks 
-        run_job(job, results_queue)  # TODO maybe possible to put as a oneline ?
+        await run_job(job, results_queue)  # TODO maybe possible to put as a oneline ?
